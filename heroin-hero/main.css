@@ -1,0 +1,30 @@
+html, body { 
+    overflow: hidden;
+    padding: 0px; margin: 0px; 
+    width: 100%; height: 100%;
+}
+
+canvas {
+  background:pink;
+}
+
+.fullScreen { 
+    height: 100%; 
+}
+
+#hands {
+  background-image: url('hand-sprite.png');
+  position: absolute;
+  width: 1920px;
+  height: 1080px;
+  /* opacity: .3; */
+}
+
+#play {
+  z-index: 1;
+  position: absolute;
+  display: block;
+  margin: 0 auto;
+  width: 50%;
+  font-size: 3em;
+}
