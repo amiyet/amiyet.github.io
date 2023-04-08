@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <link rel="stylesheet" href="styles.css"></link>
+    </head>
+    <body style="margin:0;background-size: 50% 100%;">
+        <video onloadedmetadata="onPlay(this)" id="inputVideo" autoplay muted playsinline style="visibility: hidden;" ></video>
+        <!-- <canvas id="overlay"></canvas> -->
+        <!-- <img id="leftEye" width="256" height="256"/> -->
+        <!-- <img id="rightEye" width="256" height="256"/> -->
+        <div id="right" style="opacity: 100%; transform: scaleX(-1); background-size:100% auto; position: absolute; left:0;top:0;bottom:0;width:50%;"></div>
+        <div id="left" style="opacity: 100%; transform: scaleX(-1); background-size:100% auto; position: absolute; right:0;top:0;bottom:0;width:50%;"></div>
+        <script src="face-api.min.js"></script>
+        <script>
+            const leftHalf = document.getElementById('left');
+            const rightHalf = document.getElementById('right');
+            // const leftEyeImg = document.getElementById('leftEye');
+            // leftEyeCanvas.width = 256;
+            // leftEyeCanvas.height = 256;
+
+            function setUpEyeWorker(targetEle) {
+                const leftEyeCanvas = document.createElement("canvas");
+                const offscreen = leftEyeCanvas.transferControlToOffscreen();
+                const worker = new Worker("offscreencanvas.js");
+                worker.postMessage({type: "canvas", payload: offscreen}, [offscreen]);
+                worker.addEventListener("message", function handleMessageFromWorker(msg) {
+                    // leftEyeImg.src = msg.data;
+                    targetEle.style.backgroundImage = "url('" + msg.data + "')";
+                });
+
+                return worker;
+            }
+                
+            const leftEyeWorker = setUpEyeWorker(leftHalf);
+            const rightEyeWorker = setUpEyeWorker(rightHalf);
+
+            function isFaceDetectionModelLoaded() {
+                return !!faceapi.nets.tinyFaceDetector.params
+            }
+
+            // function updateTimeStats(timeInMs) {
+            //     forwardTimes = [timeInMs].concat(forwardTimes).slice(0, 30)
+            //     const avgTimeInMs = forwardTimes.reduce((total, t) => total + t) / forwardTimes.length
+            //     $('#time').val(`${Math.round(avgTimeInMs)} ms`)
+            //     $('#fps').val(`${faceapi.utils.round(1000 / avgTimeInMs)}`)
+            // }
+
+            async function onPlay() {
+                const videoEl = document.getElementById('inputVideo');
+
+
+                if(videoEl.paused || videoEl.ended || !isFaceDetectionModelLoaded())
+                    return requestAnimationFrame(() => onPlay())
+
+
+                // tiny_face_detector options
+                let inputSize = 224;
+                let scoreThreshold = 0.5;
+                const options = new faceapi.TinyFaceDetectorOptions({ inputSize, scoreThreshold })
+
+                // const ts = Date.now()
+
+                const result = await faceapi.detectSingleFace(videoEl, options).withFaceLandmarks()
+
+                // updateTimeStats(Date.now() - ts)
+
+                if (result) {
+
+                    const leftEyeBox = faceapi.minBbox(result.landmarks.getLeftEye());
+                    const rightEyeBox = faceapi.minBbox(result.landmarks.getRightEye());
+
+
+                    //debug:
+                    // const canvas = document.getElementById('overlay');
+                    // const dims = faceapi.matchDimensions(canvas, videoEl, true)
+                    // const resizedResult = faceapi.resizeResults(result, dims)
+
+                    const leftDrawBox = new faceapi.draw.DrawBox(leftEyeBox);
+                    const rightDrawBox = new faceapi.draw.DrawBox(rightEyeBox);
+
+                    if (true) {
+                        //debug:
+                        // (new faceapi.draw.DrawBox(leftEyeBox)).draw(canvas);
+                        // (new faceapi.draw.DrawBox(rightEyeBox)).draw(canvas);
+                        const frameCtx = faceapi.createCanvasFromMedia(videoEl).getContext('2d',  { willReadFrequently: true });
+                        const postMsg = (worker, context, {x, y, width, height}) => {
+                            worker.postMessage({type: "data", payload: context.getImageData(x, y, width, height)});
+                        };
+                        postMsg(leftEyeWorker, frameCtx, leftDrawBox.box);
+                        postMsg(rightEyeWorker, frameCtx, rightDrawBox.box);
+                    }
+                        //faceapi.draw.drawFaceLandmarks(canvas, resizedResult)
+                }
+
+                requestAnimationFrame(() => onPlay())
+            }
+            
+            async function main() {
+                // load face detection and face landmark models
+                await faceapi.nets.tinyFaceDetector.loadFromUri('assets');
+                await faceapi.loadFaceLandmarkModel('assets')
+                // console.log(faceapi.nets);
+
+                // try to access users webcam and stream the images
+                // to the video element
+                const stream = await navigator.mediaDevices.getUserMedia({ video: {} })
+                const videoEl = document.getElementById('inputVideo');
+                videoEl.srcObject = stream;
+            }
+
+            document.addEventListener('DOMContentLoaded', function () {
+                main();
+            });
+        </script>
+        <!--credit to https://github.com/justadudewhohacks/face-api.js/ -->
+    </body>
+</html>
