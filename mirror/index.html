@@ -4,7 +4,7 @@
   <head>
     <title>Mirror</title>
   </head>
-  <body>
+  <body style="margin:0; padding:0; background: black; height:100%">
     <script>
       var video = document.createElement('video');
       video.setAttribute('playsinline', '');
@@ -12,6 +12,7 @@
       video.setAttribute('muted', '');
       video.style.width = '100%';
       video.style.height = '100%';
+      video.style.transform = 'scaleX(-1)';
 
       var facingMode = 'user';
       var constraints = {
