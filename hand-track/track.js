@@ -1,6 +1,7 @@
 const video = document.getElementById('myvideo');
 const canvas = document.getElementById('canvas');
 const context = canvas.getContext('2d');
+const info = document.getElementById('info');
 
 let isVideo = false;
 let model = null;
@@ -26,6 +27,7 @@ function runDetection() {
   model.detect(video).then((predictions) => {
     const prediction = predictions.find((p) => p.label === 'open');
     if (prediction) {
+      info.innerText = prediction.label;
       console.log(prediction.label);
 
       context.fillStyle = 'black';
@@ -33,7 +35,10 @@ function runDetection() {
       context.arc(prediction.bbox[0], prediction.bbox[1], 5, 0, 2 * Math.PI);
       context.strokeStyle = '1px';
       context.stroke();
+    } else {
+      info.innerText = 'no detection';
     }
+
     // model.renderPredictions(predictions, canvas, context, video);
     if (isVideo) {
       requestAnimationFrame(runDetection);
