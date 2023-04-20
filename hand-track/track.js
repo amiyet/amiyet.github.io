@@ -11,6 +11,10 @@ const modelParams = {
   maxNumBoxes: 2, // maximum number of boxes to detect
   iouThreshold: 0.5, // ioU threshold for non-max suppression
   scoreThreshold: 0.6, // confidence threshold for predictions.
+  // basePath: '.',
+  // modelType: '',
+  // modelSize: '',
+  // fromTFHub: true,
 };
 
 function startVideo() {
@@ -25,7 +29,9 @@ function startVideo() {
 
 function runDetection() {
   model.detect(video).then((predictions) => {
-    const prediction = predictions.find((p) => p.label === 'open');
+    const prediction = predictions.find(
+      (p) => p.label === 'open' || p.label === 'point'
+    );
     if (prediction) {
       info.innerText = prediction.label;
       console.log(prediction.label);
@@ -45,7 +51,8 @@ function runDetection() {
     }
   });
 }
-
+handTrack.ObjectDetection = null;
+console.log(handTrack);
 // Load the model.
 handTrack.load(modelParams).then((lmodel) => {
   startVideo();
