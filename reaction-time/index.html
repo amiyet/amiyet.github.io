@@ -37,9 +37,10 @@
     }
 
     function startGame() {
-        state = 'active';
+        state = 'wait';
         displayMessage('Wait');
         setTimeout(() => {
+            state = 'active';
             displayMessage('Click Now!');
             startTime = new Date().getTime();
             document.getElementById('btn').style.backgroundColor = 'green';
@@ -51,6 +52,7 @@
             endTime = new Date().getTime();
             const reactionTime = (endTime - startTime) / 1000;
             alert(`Your reaction time is ${reactionTime} seconds`);
+            document.writeLine(reactionTime);
             startGame();
             document.getElementById('btn').style.backgroundColor = 'red';
         } else {
