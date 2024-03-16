@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Reaction Time Test</title>
+<style>
+    #container {
+        text-align: center;
+    }
+    #btn {
+        padding: 10px 20px;
+        font-size: 18px;
+        cursor: pointer;
+        background-color: red;
+    }
+</style>
+</head>
+<body>
+<div id="container">
+    <h1>Reaction Time Test</h1>
+    <p>Click the button as soon as it changes!</p>
+    <button id="btn">Start</button>
+</div>
+<script>
+    let startTime, endTime;
+    let state = 'wait'; // wait or active
+
+    function getRandomTime(min, max) {
+        return Math.floor(Math.random() * (max - min + 1) + min);
+    }
+
+    function displayMessage(message) {
+        document.getElementById('btn').innerText = message;
+    }
+
+    function startGame() {
+        state = 'active';
+        displayMessage('Wait');
+        setTimeout(() => {
+            displayMessage('Click Now!');
+            startTime = new Date().getTime();
+            document.getElementById('btn').style.backgroundColor = 'green';
+        }, getRandomTime(1000, 5000));
+    }
+
+    document.getElementById('btn').addEventListener('click', function() {
+        if (state === 'active') {
+            endTime = new Date().getTime();
+            const reactionTime = (endTime - startTime) / 1000;
+            alert(`Your reaction time is ${reactionTime} seconds`);
+            startGame();
+            document.getElementById('btn').style.backgroundColor = 'red';
+        } else {
+            alert('Wait for the button to change!');
+        }
+    });
+
+    startGame();
+</script>
+</body>
+</html>
