@@ -23,6 +23,8 @@
     <h1>Reaction Time Test</h1>
     <p>Click the button as soon as it changes!</p>
     <button id="btn">Start</button>
+    <ul id="results">
+    </ul>
 </div>
 <script>
     let startTime, endTime;
@@ -52,7 +54,10 @@
             endTime = new Date().getTime();
             const reactionTime = (endTime - startTime) / 1000;
             alert(`Your reaction time is ${reactionTime} seconds`);
-            document.writeLine(reactionTime);
+            let results = document.getElementById('results');
+            let li = document.createElement('li');
+            li.innerText = reactionTime;
+            results.appendChild(li);
             startGame();
             document.getElementById('btn').style.backgroundColor = 'red';
         } else {
