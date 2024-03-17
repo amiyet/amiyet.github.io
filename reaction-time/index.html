@@ -50,18 +50,21 @@
     }
 
     document.getElementById('btn').addEventListener('click', function() {
+     
+        let results = document.getElementById('results');
+        let li = document.createElement('li');      
+        
         if (state === 'active') {
             endTime = new Date();
             const reactionTime = (endTime.getTime() - startTime) / 1000;
             alert(`Your reaction time is ${reactionTime} seconds`);
-            let results = document.getElementById('results');
-            let li = document.createElement('li');
             li.innerText = endTime.toLocaleString() + ' ' + reactionTime + 's';
             results.appendChild(li);
             startGame();
             document.getElementById('btn').style.backgroundColor = 'red';
         } else {
-            alert('Wait for the button to change!');
+            li.innerText = 'Junped the gun';
+            results.appendChild(li);
         }
     });
 
