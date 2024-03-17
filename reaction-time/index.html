@@ -57,13 +57,12 @@
         if (state === 'active') {
             endTime = new Date();
             const reactionTime = (endTime.getTime() - startTime) / 1000;
-            alert(`Your reaction time is ${reactionTime} seconds`);
             li.innerText = endTime.toLocaleString() + ' ' + reactionTime + 's';
             results.appendChild(li);
             startGame();
             document.getElementById('btn').style.backgroundColor = 'red';
         } else {
-            li.innerText = 'Junped the gun';
+            li.innerText = 'Jumped the gun';
             results.appendChild(li);
         }
     });
