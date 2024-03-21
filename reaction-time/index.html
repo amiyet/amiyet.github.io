@@ -49,16 +49,32 @@
         }, getRandomTime(1000, 5000));
     }
 
+    function saveResultsToCookie(result) {
+        let results = JSON.parse(localStorage.getItem('reactionResults')) || [];
+        results.push(result);
+        localStorage.setItem('reactionResults', JSON.stringify(results));
+    }
+
+    function loadResultsFromCookie() {
+        let results = JSON.parse(localStorage.getItem('reactionResults')) || [];
+        results.forEach(result => {
+            let li = document.createElement('li');
+            li.innerText = result;
+            document.getElementById('results').appendChild(li);
+        });
+    }
+
     document.getElementById('btn').addEventListener('click', function() {
-     
         let results = document.getElementById('results');
-        let li = document.createElement('li');      
-        
+        let li = document.createElement('li');
+
         if (state === 'active') {
             endTime = new Date();
             const reactionTime = (endTime.getTime() - startTime) / 1000;
-            li.innerText = endTime.toLocaleString() + ' ' + reactionTime + 's';
+            const resultString = endTime.toLocaleString() + ' ' + reactionTime + 's';
+            li.innerText = resultString;
             results.appendChild(li);
+            saveResultsToCookie(resultString);
             startGame();
             document.getElementById('btn').style.backgroundColor = 'red';
         } else {
@@ -67,6 +83,7 @@
         }
     });
 
+    loadResultsFromCookie();
     startGame();
 </script>
 </body>
